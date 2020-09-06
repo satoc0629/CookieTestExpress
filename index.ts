@@ -2,6 +2,7 @@ import express, {RequestHandler} from "express"
 import path from "path"
 import cookieParser from "cookie-parser"
 import * as fs from "fs";
+import {v4 as uuid} from "uuid"
 
 const port = 3000
 
@@ -55,8 +56,25 @@ server.get("/toBRedirect", (req,res)=>{
     res.writeHead(302,  {
         'Location': 'http://192.168.1.31:3000/B'
     })
+    res.end()
 })
+const authsUUID:Array<string> = []
 server.get("/B", (req,res)=> {
+
+    if (authsUUID.includes(req.cookies.sessionId)) {
+        // auth OK
+        res.writeHead(302,  {
+            'Location': 'http://192.168.10.8:3000/'
+        })
+    }
+
+    res.cookie('byB', new Date().getMilliseconds(), {path: "/B", httpOnly: true, secure: false})
+    res.cookie('byBNotHttpOnly', new Date().getMilliseconds(), {path: "/B", httpOnly: false, secure: false})
+
+    const sessionId = uuid()
+    authsUUID.push(sessionId)
+    res.cookie('sessionId', sessionId)
+
     res.send(`
     <form action="http://localhost:3000/toARedirect">
         <input type="submit" value="Redirect to A"/>
@@ -64,12 +82,10 @@ server.get("/B", (req,res)=> {
     `)
 })
 server.get("/toARedirect", (req,res)=>{
-    res.cookie('byB', new Date().getMilliseconds(), {path: "/", httpOnly: true, secure: false})
-    res.cookie('byBNotHttpOnly', new Date().getMilliseconds(), {path: "/", httpOnly: false, secure: false})
     res.writeHead(302,  {
-        'Location': 'http://192.168.10.8:3000/A'
+        'Location': 'http://192.168.10.8:3000/'
     })
-
+    res.end()
 })
 
 server.listen(port)
