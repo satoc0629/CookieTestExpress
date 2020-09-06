@@ -113,12 +113,10 @@ server.get("/toARedirect", (req, res) => {
     res.end()
 })
 server.get("/DirectA",(req,res)=>{
-    res.write(SiteA)
-    res.end()
+    res.send(SiteA)
 })
 server.get("/DirectB",(req,res)=>{
-    res.write(SiteB)
-    res.end()
+    res.send(SiteB)
 })
 
 server.listen(port)
