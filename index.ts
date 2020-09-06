@@ -13,7 +13,7 @@ const SiteA =`
         <form action="/">
             <input type="submit" value="Refresh">
         </form>
-        <form action="http://192.168.1.31:3000/B">
+        <form action="http://192.168.1.31:3000/DirectB">
             <input type="submit" value="Direct to B"/>
         </form>
     `
@@ -24,7 +24,7 @@ const SiteB=`
         <form action="/B">
             <input type="submit" value="Refresh">
         </form>
-        <form action="http://192.168.10.8:3000/">
+        <form action="http://192.168.10.8:3000/DirectA">
             <input type="submit" value="Direct to A"/>
         </form>
     `
