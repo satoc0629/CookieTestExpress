@@ -6,6 +6,29 @@ import {v4 as uuid} from "uuid"
 
 const port = 3000
 
+const SiteA =`
+    <form action="http://localhost:3000/toBRedirect">
+        <input type="submit" value="Redirect To B"/>
+    </form>
+        <form action="/">
+            <input type="submit" value="Refresh">
+        </form>
+        <form action="http://192.168.1.31:3000/B">
+            <input type="submit" value="Direct to B"/>
+        </form>
+    `
+const SiteB=`
+        <form action="http://localhost:3000/toARedirect">
+            <input type="submit" value="Redirect to A"/>
+        </form>
+        <form action="/B">
+            <input type="submit" value="Refresh">
+        </form>
+        <form action="http://192.168.10.8:3000/">
+            <input type="submit" value="Direct to A"/>
+        </form>
+    `
+
 const server = express()
 // const staticPath = path.join(__dirname, "./dist")
 // server.use(express.static(staticPath,{
@@ -46,21 +69,11 @@ server.get("/", (req, res) => {
     // res.write("OK")
     res.cookie('ByRoot', new Date().getMilliseconds(), {path: "/", httpOnly: true, secure: false})
     res.cookie('byRootNotHttpOnly', new Date().getMilliseconds(), {path: "/", httpOnly: false, secure: false})
-    res.send(`
-    <form action="http://localhost:3000/toBRedirect">
-        <input type="submit" value="Redirect To B"/>
-    </form>
-        <form action="/">
-            <input type="submit" value="Refresh">
-        </form>
-        <form action="http://192.168.1.31:3000/B">
-            <input type="submit" value="Direct to B"/>
-        </form>
-    `)
+    res.send(SiteA)
 })
 server.get("/toBRedirect", (req, res) => {
     res.writeHead(302, {
-        'Location': 'http://192.168.1.31:3000/B'
+        'Location': 'http://192.168.1.31:3000/DirectB'
     })
     res.end()
 })
@@ -91,22 +104,20 @@ server.get("/B", (req, res) => {
     res.cookie('sessionIdLax', sessionId, {sameSite: "lax"})
     res.cookie('sessionIdStrict', sessionId, {sameSite: "strict"})
 
-    res.send(`
-        <form action="http://localhost:3000/toARedirect">
-            <input type="submit" value="Redirect to A"/>
-        </form>
-        <form action="/B">
-            <input type="submit" value="Refresh">
-        </form>
-        <form action="http://192.168.10.8:3000/">
-            <input type="submit" value="Direct to A"/>
-        </form>
-    `)
+    res.send(SiteB)
 })
 server.get("/toARedirect", (req, res) => {
     res.writeHead(302, {
         'Location': 'http://192.168.10.8:3000/'
     })
+    res.end()
+})
+server.get("/DirectA",(req,res)=>{
+    res.write(SiteA)
+    res.end()
+})
+server.get("/DirectB",(req,res)=>{
+    res.write(SiteB)
     res.end()
 })
 
